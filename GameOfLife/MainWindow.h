@@ -3,9 +3,9 @@
 class MainWindow : public wxFrame
 {
 public:
-	MainWindow();
+	MainWindow();      // MainWindow Constructor
 
-	~MainWindow();
+	~MainWindow();     // MainWindow Destructor
 
 };
 

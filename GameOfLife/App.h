@@ -6,7 +6,7 @@
 class App : public wxApp
 {
 private:
-	MainWindow* mainWindow;
+	MainWindow* mainWindow;     // MainWindow pointer
 public:
 	
 	App();
