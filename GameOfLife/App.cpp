@@ -14,6 +14,6 @@ App::~App() {
 bool App::OnInit() 
 {
 	mainWindow = new MainWindow();   // Instantiate MainWindow Pointer
-	mainWindow->Show();              // Call Show()
+	mainWindow->Show(true);          // Call Show()
 	return true;
 }
