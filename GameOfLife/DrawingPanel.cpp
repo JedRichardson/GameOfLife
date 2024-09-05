@@ -28,14 +28,14 @@ void DrawingPanel::OnPaint(wxPaintEvent& paint)
 
 	int xPosition;
 	int yPosition;
-	int width = 10;
-	int height = 10;
+	int width = (GetSize().GetWidth()) / gridSize;
+	int height = (GetSize().GetHeight()) / gridSize;
 	for (size_t i = 0; i < gridSize; i++)
 	{
-		xPosition = i * 10;
+		xPosition = i * width;
 		for (size_t j = 0; j < gridSize; j++)
 		{
-			yPosition = j * 10;
+			yPosition = j * height;
 			context->DrawRectangle(xPosition, yPosition, width, height);
 		}
 	}
