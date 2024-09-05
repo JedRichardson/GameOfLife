@@ -4,7 +4,7 @@
 
 
 
-DrawingPanel::DrawingPanel() : wxPanel(this, wxID_ANY, wxPoint(0, 0), wxSize(50, 50))
+DrawingPanel::DrawingPanel(wxFrame* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
 	this->Bind(wxEVT_PAINT, &DrawingPanel::OnPaint, this);
@@ -16,7 +16,7 @@ DrawingPanel::~DrawingPanel()
 {
 }
 
-void DrawingPanel::OnPaint(wxPaintEvent&)
+void DrawingPanel::OnPaint(wxPaintEvent& paint)
 {
 	wxAutoBufferedPaintDC dc(this);
 	dc.Clear();
@@ -24,5 +24,21 @@ void DrawingPanel::OnPaint(wxPaintEvent&)
 	if (!context) { return; }
 	context->SetPen(*wxBLACK);
 	context->SetBrush(*wxWHITE);
-	context->DrawRectangle(0,0,10,10);
+	
+
+	int xPosition;
+	int yPosition;
+	int width = 10;
+	int height = 10;
+	for (size_t i = 0; i < gridSize; i++)
+	{
+		xPosition = i * 10;
+		for (size_t j = 0; j < gridSize; j++)
+		{
+			yPosition = j * 10;
+			context->DrawRectangle(xPosition, yPosition, width, height);
+		}
+	}
+	
+	
 }

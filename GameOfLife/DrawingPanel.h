@@ -2,11 +2,13 @@
 #include "wx/wx.h"
 class DrawingPanel : public wxPanel
 {
+private:
+	int gridSize = 15;
 public:
-	DrawingPanel();
+	DrawingPanel(wxFrame* parent);
 
 	~DrawingPanel();
 
-	void OnPaint(wxPaintEvent&);
+	void OnPaint(wxPaintEvent& paint);
 };
 

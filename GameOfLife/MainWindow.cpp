@@ -9,5 +9,6 @@ MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Game of Life",        // 
 
 MainWindow::~MainWindow()                                                    // MainWindow Destructor
 {
+
 }
 
