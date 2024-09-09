@@ -1,14 +1,31 @@
 #include "MainWindow.h"
 
 
+
+
 MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Game of Life",        // MainWindow Constuctor
-	wxPoint(0, 0), wxSize(400, 400))
+	wxPoint(0, 0), wxSize(500, 500))
 {
 	drawingPanel = new DrawingPanel(this);
+	sizer = new wxBoxSizer(wxVERTICAL);
+	sizer->Add(drawingPanel, 1, wxEXPAND | wxALL);
+	this->SetSizer(sizer);
+	this->Bind(wxEVT_SIZE, &MainWindow::OnSizeChange, this);
+	
+	
 }
 
 MainWindow::~MainWindow()                                                    // MainWindow Destructor
 {
 
 }
+
+void MainWindow::OnSizeChange(wxSizeEvent& event)
+{
+	drawingPanel->SetSize(event.GetSize());
+	drawingPanel->Refresh();
+	event.Skip();
+}
+
+
 
