@@ -4,7 +4,7 @@
 
 
 
-DrawingPanel::DrawingPanel(wxFrame* parent) : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize)
+DrawingPanel::DrawingPanel(wxFrame* parent, std::vector<std::vector<bool>>& gameBoard) : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), gameBoardRef(gameBoard)
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
 	this->Bind(wxEVT_PAINT, &DrawingPanel::OnPaint, this);
@@ -28,8 +28,8 @@ void DrawingPanel::OnPaint(wxPaintEvent& paint)
 
 	int xPosition;
 	int yPosition;
-	int width = (GetSize().GetWidth()) / gridSize;
-	int height = (GetSize().GetHeight()) / gridSize;
+	float width = (GetSize().GetWidth()) / (float)gridSize;
+	float height = (GetSize().GetHeight()) / (float)gridSize;
 	for (size_t i = 0; i < gridSize; i++)
 	{
 		xPosition = i * width;
@@ -41,4 +41,9 @@ void DrawingPanel::OnPaint(wxPaintEvent& paint)
 	}
 	
 	
+}
+
+void DrawingPanel::SetGridSize(int size)
+{
+	gridSize = size;
 }
