@@ -8,6 +8,7 @@ DrawingPanel::DrawingPanel(wxFrame* parent, std::vector<std::vector<bool>>& game
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
 	this->Bind(wxEVT_PAINT, &DrawingPanel::OnPaint, this);
+	this->Bind(wxEVT_LEFT_UP, &DrawingPanel::MouseClick, this);
 }
 
 
@@ -39,11 +40,29 @@ void DrawingPanel::OnPaint(wxPaintEvent& paint)
 			context->DrawRectangle(xPosition, yPosition, width, height);
 		}
 	}
-	
+	Refresh();
 	
 }
 
 void DrawingPanel::SetGridSize(int size)
 {
 	gridSize = size;
+}
+
+void DrawingPanel::MouseClick(wxMouseEvent& event)
+{
+	int x = event.GetX();
+	int y = event.GetY();
+	float width = (GetSize().GetWidth()) / (float)gridSize;
+	float height = (GetSize().GetHeight()) / (float)gridSize;
+	int row = x / width;
+	int column = y / height;
+	if (gameBoardRef[row][column])
+	{
+		true;
+	}
+	if (!gameBoardRef[row][column])
+	{
+		false;
+	}
 }

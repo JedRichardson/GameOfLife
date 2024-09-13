@@ -14,5 +14,6 @@ public:
 	void OnPaint(wxPaintEvent& paint);
 	void SetGridSize(int size);
 	int GetGridSize() { return gridSize; }
+	void MouseClick(wxMouseEvent&);
 };
 
