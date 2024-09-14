@@ -7,12 +7,14 @@ wxEND_EVENT_TABLE()
 MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Game of Life",        // MainWindow Constuctor
 	wxPoint(0, 0), wxSize(500, 500))
 {
+	statusBar = CreateStatusBar();
+	MainWindow::StatusBarText();
 	drawingPanel = new DrawingPanel(this, gameBoard_);
 	sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(drawingPanel, 1, wxEXPAND | wxALL);
 	this->SetSizer(sizer);
 	GridInitializer();
-	
+	this->Layout();
 }
 
 MainWindow::~MainWindow()                                                    // MainWindow Destructor
@@ -35,6 +37,11 @@ void MainWindow::GridInitializer()
 		i.resize(gridSize_);
 	}
 	drawingPanel->SetGridSize(gridSize_);
+}
+
+void MainWindow::StatusBarText()
+{
+	statusBar->SetStatusText("Generation: ");
 }
 
 

@@ -7,12 +7,16 @@ class MainWindow : public wxFrame
 	wxBoxSizer* sizer;
 	std::vector<std::vector<bool>> gameBoard_;
 	int gridSize_ = 10;
+	int generation;
+	int livingCells;
+	wxStatusBar* statusBar;
 
 public:
 	MainWindow();      // MainWindow Constructor
 	~MainWindow();     // MainWindow Destructor
 	void OnSizeChange(wxSizeEvent& event);
 	void GridInitializer();
+	void StatusBarText();
 
 	wxDECLARE_EVENT_TABLE();
 
