@@ -25,7 +25,7 @@ void DrawingPanel::OnPaint(wxPaintEvent& paint)
 	if (!context) { return; }
 	context->SetPen(*wxBLACK);
 	context->SetBrush(*wxWHITE);
-	
+
 
 	int xPosition;
 	int yPosition;
@@ -37,11 +37,16 @@ void DrawingPanel::OnPaint(wxPaintEvent& paint)
 		for (size_t j = 0; j < gridSize; j++)
 		{
 			yPosition = j * height;
+			if (gameBoardRef[i][j])
+			{
+				context->SetBrush(*wxLIGHT_GREY);
+			}
+			else
+				context->SetBrush(*wxWHITE);
 			context->DrawRectangle(xPosition, yPosition, width, height);
 		}
 	}
 	Refresh();
-	
 }
 
 void DrawingPanel::SetGridSize(int size)
@@ -57,12 +62,5 @@ void DrawingPanel::MouseClick(wxMouseEvent& event)
 	float height = (GetSize().GetHeight()) / (float)gridSize;
 	int row = x / width;
 	int column = y / height;
-	if (gameBoardRef[row][column])
-	{
-		true;
-	}
-	if (!gameBoardRef[row][column])
-	{
-		false;
-	}
+	gameBoardRef[row][column] = !gameBoardRef[row][column];
 }
