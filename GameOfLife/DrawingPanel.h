@@ -1,5 +1,6 @@
 #pragma once
 #include "wx/wx.h"
+
 class DrawingPanel : public wxPanel
 {
 private:
@@ -15,5 +16,6 @@ public:
 	void SetGridSize(int size);
 	int GetGridSize() { return gridSize; }
 	void MouseClick(wxMouseEvent&);
-};
 
+	wxDECLARE_EVENT_TABLE();
+};

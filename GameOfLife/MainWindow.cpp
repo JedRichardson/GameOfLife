@@ -1,5 +1,8 @@
 #include "MainWindow.h"
 
+wxBEGIN_EVENT_TABLE(MainWindow, wxFrame)
+	EVT_SIZE(MainWindow::OnSizeChange)
+wxEND_EVENT_TABLE()
 
 MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Game of Life",        // MainWindow Constuctor
 	wxPoint(0, 0), wxSize(500, 500))
@@ -8,7 +11,6 @@ MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Game of Life",        // 
 	sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(drawingPanel, 1, wxEXPAND | wxALL);
 	this->SetSizer(sizer);
-	this->Bind(wxEVT_SIZE, &MainWindow::OnSizeChange, this);
 	GridInitializer();
 	
 }

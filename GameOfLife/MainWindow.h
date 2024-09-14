@@ -14,7 +14,7 @@ public:
 	void OnSizeChange(wxSizeEvent& event);
 	void GridInitializer();
 
-	
+	wxDECLARE_EVENT_TABLE();
 
 
 };
