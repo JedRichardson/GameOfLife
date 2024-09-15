@@ -10,6 +10,7 @@ class MainWindow : public wxFrame
 	int generation;
 	int livingCells;
 	wxStatusBar* statusBar;
+	wxToolBar* toolBar;
 
 public:
 	MainWindow();      // MainWindow Constructor
@@ -17,6 +18,10 @@ public:
 	void OnSizeChange(wxSizeEvent& event);
 	void GridInitializer();
 	void StatusBarText();
+	void Play(wxCommandEvent& event);
+	void Pause(wxCommandEvent& event);
+	void Next(wxCommandEvent& event);
+	void Trash(wxCommandEvent& event);
 
 	wxDECLARE_EVENT_TABLE();
 
