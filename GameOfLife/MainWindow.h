@@ -11,6 +11,7 @@ class MainWindow : public wxFrame
 	int livingCells;
 	wxStatusBar* statusBar;
 	wxToolBar* toolBar;
+	std::vector<std::vector<bool>> sandbox;
 
 public:
 	MainWindow();      // MainWindow Constructor
@@ -22,6 +23,8 @@ public:
 	void Pause(wxCommandEvent& event);
 	void Next(wxCommandEvent& event);
 	void Trash(wxCommandEvent& event);
+	int NeightborCount(int row, int column);
+	int Generation();
 
 	wxDECLARE_EVENT_TABLE();
 

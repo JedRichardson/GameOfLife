@@ -83,4 +83,18 @@ void MainWindow::Trash(wxCommandEvent& event)
 {
 }
 
+int MainWindow::NeightborCount(int row, int column)
+{
+	for (size_t x = -1; x <= 1; x++)
+	{
+		for (size_t y = -1; y <= 1; y++) 
+		{
+			if ((x == 0 && y == 0))
+				continue;
+			livingCells = gameBoard_[x][y];
+		}
+	}
+	return livingCells;
+}
+
 
