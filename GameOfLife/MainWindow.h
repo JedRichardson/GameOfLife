@@ -23,7 +23,7 @@ public:
 	void Pause(wxCommandEvent& event);
 	void Next(wxCommandEvent& event);
 	void Trash(wxCommandEvent& event);
-	int NeightborCount(int row, int column);
+	int NeighborCount(int row, int column);
 	int Generation();
 
 	wxDECLARE_EVENT_TABLE();

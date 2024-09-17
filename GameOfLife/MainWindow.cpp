@@ -83,18 +83,51 @@ void MainWindow::Trash(wxCommandEvent& event)
 {
 }
 
-int MainWindow::NeightborCount(int row, int column)
+int MainWindow::NeighborCount(int row, int column)
 {
 	for (size_t x = -1; x <= 1; x++)
 	{
 		for (size_t y = -1; y <= 1; y++) 
 		{
-			if ((x == 0 && y == 0))
+			int cellX = row + x;
+			int cellY = column + y;
+			if ((x == 0 && y == 0)|| cellX < 0 || cellX >= gridSize_ || cellY < 0 || cellY >= gridSize_)
 				continue;
-			livingCells = gameBoard_[x][y];
+			livingCells = gameBoard_[row + x][column + y];
 		}
 	}
 	return livingCells;
 }
 
-
+int MainWindow::Generation()
+{
+	bool isLiving;
+	sandbox.resize(gridSize_);
+	for (auto& i : sandbox)
+	{
+		i.resize(gridSize_);
+	}
+	for (size_t x = 0; x <= gridSize_; x++)
+	{
+		for (size_t y = 0; y <= gridSize_; y++)
+		{
+			int livingNeighbors = this->NeighborCount(x, y);
+			if (livingNeighbors < 2)
+			{
+				isLiving = false;
+			}
+			if (livingNeighbors > 3)
+			{
+				isLiving = false;
+			}
+			if (livingNeighbors >= 2 && livingNeighbors <= 3)
+			{
+				isLiving = true;
+			}
+			else 
+				bool living = sandbox[x][y];
+			sandbox[x][y] = isLiving;
+			return sandbox[x][y];
+		}
+	}
+}
