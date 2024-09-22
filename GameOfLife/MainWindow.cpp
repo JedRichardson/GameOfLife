@@ -10,13 +10,15 @@ wxBEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_MENU(0002, MainWindow::Pause)
 	EVT_MENU(0003, MainWindow::Next)
 	EVT_MENU(0004, MainWindow::Trash)
+	EVT_TIMER(0005, MainWindow::Timer)
 wxEND_EVENT_TABLE()
 
 MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Game of Life",        // MainWindow Constuctor
 	wxPoint(0, 0), wxSize(500, 500))
 {
 	statusBar = CreateStatusBar();
-	MainWindow::StatusBarText();
+	statusBar->SetFieldsCount(2);
+	MainWindow::UpdateStatusBar();
 	toolBar = CreateToolBar();
 	wxBitmap playIcon(play_xpm);
 	toolBar->AddTool(0001, "Play", playIcon);
@@ -27,12 +29,14 @@ MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Game of Life",        // 
 	wxBitmap trashIcon(trash_xpm);
 	toolBar->AddTool(0004, "Trash", trashIcon);
 	toolBar->Realize();
+	timer = new wxTimer(this, 0005);
 	drawingPanel = new DrawingPanel(this, gameBoard_);
 	sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->Add(drawingPanel, 1, wxEXPAND | wxALL);
 	this->SetSizer(sizer);
 	GridInitializer();
 	this->Layout();
+	
 	
 }
 
@@ -62,72 +66,101 @@ void MainWindow::GridInitializer()
 	drawingPanel->SetGridSize(gridSize_);
 }
 
-void MainWindow::StatusBarText()
+void MainWindow::UpdateStatusBar()
 {
-	statusBar->SetStatusText("Generation:\t\tLiving Cells: ");
+	wxString genText = wxString::Format("Generations: %d", generation);
+	wxString cellsText = wxString::Format("Living Cells: %d", livingCells);
+
+	statusBar->SetStatusText(genText, 0);
+	statusBar->SetStatusText(cellsText, 1);
 }
 
 void MainWindow::Play(wxCommandEvent& event)
 {
+	timer->Start(gameSpeed);
 }
 
 void MainWindow::Pause(wxCommandEvent& event)
 {
+	timer->Stop();
 }
 
 void MainWindow::Next(wxCommandEvent& event)
 {
+	Generation();
 }
 
 void MainWindow::Trash(wxCommandEvent& event)
 {
+	livingCells = 0;
+	generation = 0;
+	for (size_t x = 0; x < gridSize_; x++)
+	{
+		for (size_t y = 0; y < gridSize_; y++)
+		{
+			gameBoard_[x][y] = false;
+		}
+	}
+	MainWindow::UpdateStatusBar();
+	drawingPanel->Refresh();
 }
 
 int MainWindow::NeighborCount(int row, int column)
 {
-	for (size_t x = -1; x <= 1; x++)
+	int livingNeighbors = 0;
+	for (int x = -1; x <= 1; x++)
 	{
-		for (size_t y = -1; y <= 1; y++) 
+		for (int y = -1; y <= 1; y++) 
 		{
 			int cellX = row + x;
 			int cellY = column + y;
 			if ((x == 0 && y == 0)|| cellX < 0 || cellX >= gridSize_ || cellY < 0 || cellY >= gridSize_)
 				continue;
-			livingCells = gameBoard_[row + x][column + y];
+			bool living = gameBoard_[row + x][column + y];
+			if (living)
+				livingNeighbors++;
 		}
 	}
-	return livingCells;
+	return livingNeighbors;
 }
 
 int MainWindow::Generation()
 {
-	bool isLiving;
+	livingCells = 0;
+	bool keepALive = false;
 	sandbox.resize(gridSize_);
 	for (auto& i : sandbox)
 	{
 		i.resize(gridSize_);
 	}
-	for (size_t x = 0; x <= gridSize_; x++)
+	for (size_t x = 0; x < gridSize_; x++)
 	{
-		for (size_t y = 0; y <= gridSize_; y++)
+		for (size_t y = 0; y < gridSize_; y++)
 		{
 			int livingNeighbors = this->NeighborCount(x, y);
-			if (livingNeighbors < 2)
+			bool living = gameBoard_[x][y];
+			if (living) 
 			{
-				isLiving = false;
-			}
-			if (livingNeighbors > 3)
-			{
-				isLiving = false;
-			}
-			if (livingNeighbors >= 2 && livingNeighbors <= 3)
-			{
-				isLiving = true;
+				keepALive = (livingNeighbors >= 2 && livingNeighbors <= 3);
 			}
 			else 
-				bool living = sandbox[x][y];
-			sandbox[x][y] = isLiving;
-			return sandbox[x][y];
+			{
+				keepALive = (livingNeighbors == 3);
+			}
+			
+			sandbox[x][y] = keepALive;
+			if (keepALive)
+				livingCells++;
 		}
 	}
+	swap(gameBoard_, sandbox);
+	generation++;
+	MainWindow::UpdateStatusBar();
+	drawingPanel->Refresh();
+	return generation;
+}
+
+void MainWindow::Timer(wxTimerEvent& event)
+{
+	Generation();
 }
