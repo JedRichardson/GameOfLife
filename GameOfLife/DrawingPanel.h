@@ -1,11 +1,11 @@
 #pragma once
 #include "wx/wx.h"
+#include "GameSettings.h"
 
 class DrawingPanel : public wxPanel
 {
-private:
-	int gridSize = 15;
 	std::vector<std::vector<bool>>& gameBoardRef;
+	GameSettings* pSettings;
 
 public:
 	DrawingPanel(wxFrame* parent, std::vector<std::vector<bool>>& gameBoard);
@@ -13,8 +13,7 @@ public:
 	~DrawingPanel();
 
 	void OnPaint(wxPaintEvent& paint);
-	void SetGridSize(int size);
-	int GetGridSize() { return gridSize; }
+	void SetpSettings(GameSettings* settings) { pSettings = settings; }
 	void MouseClick(wxMouseEvent&);
 
 	wxDECLARE_EVENT_TABLE();

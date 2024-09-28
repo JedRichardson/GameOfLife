@@ -8,7 +8,8 @@ wxBEGIN_EVENT_TABLE(DrawingPanel, wxPanel)
 wxEND_EVENT_TABLE()
 
 
-DrawingPanel::DrawingPanel(wxFrame* parent, std::vector<std::vector<bool>>& gameBoard) : wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), gameBoardRef(gameBoard)
+DrawingPanel::DrawingPanel(wxFrame* parent, std::vector<std::vector<bool>>& gameBoard) 
+	: wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize), gameBoardRef(gameBoard)
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
 }
@@ -31,12 +32,12 @@ void DrawingPanel::OnPaint(wxPaintEvent& paint)
 
 	int xPosition;
 	int yPosition;
-	float width = (GetSize().GetWidth()) / (float)gridSize;
-	float height = (GetSize().GetHeight()) / (float)gridSize;
-	for (size_t i = 0; i < gridSize; i++)
+	float width = (GetSize().GetWidth()) / (float)pSettings->GetGridSize();
+	float height = (GetSize().GetHeight()) / (float)pSettings->GetGridSize();
+	for (size_t i = 0; i < pSettings->GetGridSize(); i++)
 	{
 		xPosition = i * width;
-		for (size_t j = 0; j < gridSize; j++)
+		for (size_t j = 0; j < pSettings->GetGridSize(); j++)
 		{
 			yPosition = j * height;
 			if (gameBoardRef[i][j])
@@ -51,17 +52,12 @@ void DrawingPanel::OnPaint(wxPaintEvent& paint)
 	Refresh();
 }
 
-void DrawingPanel::SetGridSize(int size)
-{
-	gridSize = size;
-}
-
 void DrawingPanel::MouseClick(wxMouseEvent& event)
 {
 	int x = event.GetX();
 	int y = event.GetY();
-	float width = (GetSize().GetWidth()) / (float)gridSize;
-	float height = (GetSize().GetHeight()) / (float)gridSize;
+	float width = (GetSize().GetWidth()) / (float)pSettings->GetGridSize();
+	float height = (GetSize().GetHeight()) / (float)pSettings->GetGridSize();
 	int row = x / width;
 	int column = y / height;
 	gameBoardRef[row][column] = !gameBoardRef[row][column];

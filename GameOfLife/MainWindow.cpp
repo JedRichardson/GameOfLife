@@ -3,6 +3,7 @@
 #include "pause.xpm"
 #include "next.xpm"
 #include "trash.xpm"
+#include "wx/numdlg.h"
 
 wxBEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_SIZE(MainWindow::OnSizeChange)
@@ -10,34 +11,48 @@ wxBEGIN_EVENT_TABLE(MainWindow, wxFrame)
 	EVT_MENU(0002, MainWindow::Pause)
 	EVT_MENU(0003, MainWindow::Next)
 	EVT_MENU(0004, MainWindow::Trash)
-	EVT_TIMER(0005, MainWindow::Timer)
+	EVT_MENU(0005, MainWindow::Settings)
+	//EVT_MENU(0007, MainWindow::Randomize)
+	EVT_TIMER(0006, MainWindow::OnTimer)
+	//EVT_MENU(0007, MainWindow::RandomizeWithSeed)
 wxEND_EVENT_TABLE()
 
 MainWindow::MainWindow() : wxFrame(nullptr, wxID_ANY, "Game of Life",        // MainWindow Constuctor
 	wxPoint(0, 0), wxSize(500, 500))
 {
-	statusBar = CreateStatusBar();
-	statusBar->SetFieldsCount(2);
+	pStatusBar = CreateStatusBar();
+	pStatusBar->SetFieldsCount(2);
 	MainWindow::UpdateStatusBar();
-	toolBar = CreateToolBar();
+	pToolBar = CreateToolBar();
 	wxBitmap playIcon(play_xpm);
-	toolBar->AddTool(0001, "Play", playIcon);
+	pToolBar->AddTool(0001, "Play", playIcon);
 	wxBitmap pauseIcon(pause_xpm);
-	toolBar->AddTool(0002, "Pause", pauseIcon);
+	pToolBar->AddTool(0002, "Pause", pauseIcon);
 	wxBitmap nextIcon(next_xpm);
-	toolBar->AddTool(0003, "Next", nextIcon);
+	pToolBar->AddTool(0003, "Next", nextIcon);
 	wxBitmap trashIcon(trash_xpm);
-	toolBar->AddTool(0004, "Trash", trashIcon);
-	toolBar->Realize();
-	timer = new wxTimer(this, 0005);
-	drawingPanel = new DrawingPanel(this, gameBoard_);
-	sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(drawingPanel, 1, wxEXPAND | wxALL);
-	this->SetSizer(sizer);
+	pToolBar->AddTool(0004, "Trash", trashIcon);
+	pToolBar->Realize();
+	pMenu = new wxMenuBar();
+	SetMenuBar(pMenu);
+	pOptions = new wxMenu();
+	pOptions->Append(0005, "Settings");
+	pMenu->Append(pOptions, "Settings");
+	pRandomize = new wxMenu();
+	pRandomize->Append(0010, "Randomize");
+	pMenu->Append(pRandomize, "Randomize");
+	pRandomizeWithSeed = new wxMenu();
+	pRandomizeWithSeed->Append(0007, "Randomize with Seed");
+	pMenu->Append(pRandomizeWithSeed, "Randomize with Seed");
+	pDrawingPanel = new DrawingPanel(this, gameBoard_);
+	pDrawingPanel->SetpSettings(&settings_);
+	pSizer = new wxBoxSizer(wxVERTICAL);
+	pSizer->Add(pDrawingPanel, 1, wxEXPAND | wxALL);
+	this->SetSizer(pSizer);
 	GridInitializer();
 	this->Layout();
-	
-	
+	pInterval = new wxTimer(this, 0006);
+
 }
 
 MainWindow::~MainWindow()                                                    // MainWindow Destructor
@@ -47,23 +62,22 @@ MainWindow::~MainWindow()                                                    // 
 
 void MainWindow::OnSizeChange(wxSizeEvent& event)
 {
-	if (drawingPanel == nullptr)
+	if (pDrawingPanel == nullptr)
 	{
 		return;
 	}
-	drawingPanel->SetSize(event.GetSize());
-	drawingPanel->Refresh();
+	pDrawingPanel->SetSize(event.GetSize());
+	pDrawingPanel->Refresh();
 	event.Skip();
 }
 
 void MainWindow::GridInitializer()
 {
-	gameBoard_.resize(gridSize_);
+	gameBoard_.resize(settings_.GetGridSize());
 	for (auto& i : gameBoard_)
 	{
-		i.resize(gridSize_);
+		i.resize(settings_.GetGridSize());
 	}
-	drawingPanel->SetGridSize(gridSize_);
 }
 
 void MainWindow::UpdateStatusBar()
@@ -71,18 +85,25 @@ void MainWindow::UpdateStatusBar()
 	wxString genText = wxString::Format("Generations: %d", generation);
 	wxString cellsText = wxString::Format("Living Cells: %d", livingCells);
 
-	statusBar->SetStatusText(genText, 0);
-	statusBar->SetStatusText(cellsText, 1);
+	pStatusBar->SetStatusText(genText, 0);
+	pStatusBar->SetStatusText(cellsText, 1);
 }
 
 void MainWindow::Play(wxCommandEvent& event)
 {
-	timer->Start(gameSpeed);
+	if (pInterval->IsRunning())
+	{
+		pInterval->Stop();
+	}
+	else
+	{
+		pInterval->Start(settings_.GetGameSpeed());
+	}
 }
 
 void MainWindow::Pause(wxCommandEvent& event)
 {
-	timer->Stop();
+	pInterval->Stop();
 }
 
 void MainWindow::Next(wxCommandEvent& event)
@@ -94,15 +115,15 @@ void MainWindow::Trash(wxCommandEvent& event)
 {
 	livingCells = 0;
 	generation = 0;
-	for (size_t x = 0; x < gridSize_; x++)
+	for (size_t x = 0; x < settings_.GetGridSize(); x++)
 	{
-		for (size_t y = 0; y < gridSize_; y++)
+		for (size_t y = 0; y < settings_.GetGridSize(); y++)
 		{
 			gameBoard_[x][y] = false;
 		}
 	}
 	MainWindow::UpdateStatusBar();
-	drawingPanel->Refresh();
+	pDrawingPanel->Refresh();
 }
 
 int MainWindow::NeighborCount(int row, int column)
@@ -114,7 +135,7 @@ int MainWindow::NeighborCount(int row, int column)
 		{
 			int cellX = row + x;
 			int cellY = column + y;
-			if ((x == 0 && y == 0)|| cellX < 0 || cellX >= gridSize_ || cellY < 0 || cellY >= gridSize_)
+			if ((x == 0 && y == 0)|| cellX < 0 || cellX >= settings_.GetGridSize() || cellY < 0 || cellY >= settings_.GetGridSize())
 				continue;
 			bool living = gameBoard_[row + x][column + y];
 			if (living)
@@ -128,14 +149,14 @@ int MainWindow::Generation()
 {
 	livingCells = 0;
 	bool keepALive = false;
-	sandbox.resize(gridSize_);
+	sandbox.resize(settings_.GetGridSize());
 	for (auto& i : sandbox)
 	{
-		i.resize(gridSize_);
+		i.resize(settings_.GetGridSize());
 	}
-	for (size_t x = 0; x < gridSize_; x++)
+	for (size_t x = 0; x < settings_.GetGridSize(); x++)
 	{
-		for (size_t y = 0; y < gridSize_; y++)
+		for (size_t y = 0; y < settings_.GetGridSize(); y++)
 		{
 			int livingNeighbors = this->NeighborCount(x, y);
 			bool living = gameBoard_[x][y];
@@ -156,11 +177,56 @@ int MainWindow::Generation()
 	swap(gameBoard_, sandbox);
 	generation++;
 	MainWindow::UpdateStatusBar();
-	drawingPanel->Refresh();
+	pDrawingPanel->Refresh();
 	return generation;
 }
 
-void MainWindow::Timer(wxTimerEvent& event)
+void MainWindow::OnTimer(wxTimerEvent& event)
 {
 	Generation();
+}
+
+void MainWindow::Settings(wxCommandEvent& event)
+{
+	pSettingsDialog = new SettingsDialog(this);
+	pSettingsDialog->ShowModal();
+	if (pSettingsDialog->ShowModal())
+	{
+		GridInitializer();
+	}
+}
+
+void MainWindow::PopulateMatrix()
+{
+	matrix.resize(settings_.GetGridSize());
+	for (int i = 0; i < matrix.size(); i++)
+	{
+		matrix[i].resize(settings_.GetGridSize());
+	}
+	srand(time(NULL));
+	for (size_t i = 0; i < matrix.size(); i++)
+	{
+		for (size_t j = 0; j < matrix[i].size(); j++)
+		{
+			int num = rand();
+			if (num % 3 == 0)
+			{
+				matrix[i][j] = true;
+			}
+			else
+			{
+				matrix[i][j] = false;
+			}
+		}
+	}
+}
+
+void MainWindow::Randomize()
+{
+}
+
+void MainWindow::RandomizeWithSeed()
+{
+	wxGetNumberFromUser("Number?", "", "");
+	PopulateMatrix();
 }
